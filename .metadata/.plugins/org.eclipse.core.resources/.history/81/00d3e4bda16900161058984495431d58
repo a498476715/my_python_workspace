@@ -1,0 +1,22 @@
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+
+import pandas as pd
+from pandas import DataFrame
+from pandas import Series
+
+import helper
+
+def load_csv_data(filename, columns = None, columns_new = None):
+    '''
+    '''
+    data = pd.read_csv(filename)
+    return data
+
+def main():
+    data = load_csv_data('../data/PMinQuote.csv')
+    
+if __name__ == '__main__':
+    main()
+

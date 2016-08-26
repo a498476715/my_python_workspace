@@ -1,0 +1,191 @@
+# coding=gbk
+
+import pandas as pd
+from pandas import Series
+from pandas import DataFrame
+import matplotlib.pyplot as plt
+import numpy as np
+
+import helper
+import dp_config
+from django.dispatch.dispatcher import Signal
+
+index_list = {}
+index_list['hs300'] = '000300.SH'
+index_list['zz500'] = '000905.SH'
+index_list['sz50'] = '000016.SH'
+index_list['cybz'] = '399006.SZ'
+index_list['cybzh'] = '399102.SZ'
+
+data_set = {}
+start_date = '\'20100101\''
+short = True
+
+def get_index_from_db(wind_code, conn):
+    '''
+    希望可以自己设置数据库，设置获取不同数据(用什么价格购买，卖出)
+    '''
+    
+    sql_string = ("select TRADE_DT, S_INFO_WINDCODE, S_DQ_CLOSE, S_DQ_PCTCHANGE " 
+                  "from AINDEXEODPRICES " 
+                  "where S_INFO_WINDCODE = \'%s\' and TRADE_DT > %s"
+                  "order by TRADE_DT" % (wind_code, start_date))
+    data = pd.read_sql(sql_string, conn, index_col='trade_dt', parse_dates=['trade_dt'])
+#     data.columns = ['code', 'close', 'return']
+    return data
+
+def strategy_cross(data, short_term, long_term, short = True, short_ua = '000300.SH', freq = 'day', benchmark='self'):
+    '''
+    计算交叉策略的回报，会生成两条ma线，一条信号线，一条日收益线，以及一条复利收益线
+    short_term是短期的线的长度，为int类型
+    freq是测试日数据还是分钟数据，值可以是：day， min
+    '''
+    short_ma_str = 'ma_' + short_term
+    long_ma_str = 'ma_' + long_term
+    signal_line_str = 'sig_' + short_term + '_' + long_term
+    ret_daily_str = 'ret_daily_' + short_term + '_' + long_term
+    ret_cumprod = 'ret_sum_' + short_term + '_' + long_term
+    ua_pctchange_daily = 'S_DQ_PCTCHANGE'
+    
+    #日数据或者分钟数据
+    if freq == 'day':
+        close_str = 'S_DQ_CLOSE'
+    elif freq == 'min':
+        #功能尚未实现
+        print('This func does not support min data. ^_^')
+        print('The system will be closed. Bye!')
+        exit(1)
+    
+    #计算MA
+    if short_ma_str not in data.columns:
+        data[short_ma_str] = helper.ma_simple(data[close_str], short_term)
+    if long_ma_str not in data.columns:
+        data[long_ma_str] = helper.ma_simple(data[close_str], long_term)
+    #计算信号
+    if signal_line_str not in data.columns:
+        data[signal_line_str] = cal_signal(data.loc[:, [short_ma_str, long_ma_str]], strategy)
+    #计算每日收益%
+    if ret_daily_str not in data.columns:
+        data[ret_daily_str] = return_cross_daily(data.loc[:, [ua_pctchange_daily, short_ma_str, long_ma_str]], short, short_ua)
+    #计算累计收益%复利
+    if ret_cumprod not in data.columns:
+        data[ret_cumprod] = return_cross_compound(data[ret_daily_str])
+    #画图
+    print(data)
+
+# def return_benchmark(data, ):
+
+def return_cross_daily(data, short = True, short_ua = '000300.SH'):
+    '''
+    返回交叉方法的每日收益列
+    需要3列，分别为 0：标的收益， 1：短线ma，2：长线ma
+    '''
+    data['signal_line'] = cal_signal(data.iloc[:,1:3], strategy = 'cross')
+    data = helper.delete_na(data)
+    return_string = data.columns[0]
+    signal_string = data.columns[3]
+    print(data)
+    if short:
+        ret = (data.apply(lambda x: x[return_string] if x[signal_string] else -x[return_string], axis=1))/100 + 1
+#         ret = data.apply(lambda x: 'haha')
+    else:
+        ret = (data.apply(lambda x: x[return_string] if x[signal_string] else 0, axis=1))/100 + 1
+    
+    return ret
+
+def return_cross_compound(data):
+    '''
+    复利计算, 输入为一列日收益
+    '''
+    return data.loc[:, 0].cumprod()
+    
+
+def cal_signal(data, strategy = 'cross'):
+    '''
+    生成信号列，True为应该多头，False为应该空头/空仓.
+    默认的算法为交叉法,data是原data的切片，只是截取需要用来计算的列
+  1. 交叉方法: 需要两列，短期线和长期线的MA线。short_term列在前，long_term列在后
+    返回信号列
+    '''
+    #防止用到未来数据，要shift 1位
+    if strategy == 'cross':
+#         short_term = data.iloc[:,0]
+#         long_term = data.iloc[:,1]
+        signal_line = data.iloc[:,0] > data.iloc[:,1]
+#         print(signal_line)
+        signal_line = signal_line.shift(1)
+#         print(signal_line)
+        
+    return signal_line     
+         
+     
+if __name__ == '__main__':
+    
+    server = '253'
+    db_name = 'wddb'
+    conn = helper.connect_to_database(dp_config.db_driver[server], dp_config.db_ip[server], dp_config.db_port[server],
+                                      'wddb', dp_config.db_usr[server], dp_config.db_pwd[server])
+    
+    # 设置标的物
+    ua_string = index_list['zz500']
+    ua = ua_string
+    
+    data = get_index_from_db(ua_string, conn)
+    
+    ma_days_list = {}
+    
+    name_list = ['ma_5', 'ma_10']
+    value_list = [5, 20]
+    
+    for i in range(len(name_list)):
+        data = helper.ma_simple(data, value_list[i], column_name = name_list[i])
+    
+    
+    data = helper.delete_na(data)
+#     print(data.loc[:,['return', 'ma_5', 'ma_10']])
+    print(cal_return_cross(data.loc[:,['return', 'ma_5', 'ma_10']], short = True))
+    data_set[ua] = data
+    
+#     print(cal_signal(data[['ma_5', 'ma_10']]))
+    
+    #get a slice of data
+    data_fig_ma = data.loc[:,name_list]
+#     data_fig_ma.plot()
+    
+#     data_set[ua]['spread_5_10'] = data_set[ua]['ma_5'] > data_set[ua]['ma_10']
+#     '''
+#     找出所有crossover point
+#     '''
+#     print('##########################################')
+#     print(helper.cross_point(data, 'ma_5', 'ma_10'))
+    '''
+    计算return
+    '''
+    data_set[ua]['spread_5_10'] = data_set[ua]['ma_5'] > data_set[ua]['ma_10']
+    data_set[ua]['spread_5_10'] = data_set[ua]['spread_5_10'].shift(1)
+#     print(data_set[ua]['spread_5_10'])
+    print('、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、')
+    print(data_set[ua])
+    print('、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、')
+    if short:
+        data_set[ua]['ret_5_10'] = (data_set[ua].apply(lambda x: x['return'] if x['spread_5_10'] else -x['return'], axis=1))/100 + 1
+    else:
+        data_set[ua]['ret_5_10'] = (data_set[ua].apply(lambda x: x['return'] if x['spread_5_10'] else 0, axis=1))/100 + 1
+#     data_set[ua]['cumsum_5_10'] = data_set[ua]['ret_5_10'].cumsum()/100
+    data_set[ua]['cumsum_5_10'] = data_set[ua]['ret_5_10'].cumprod()
+#     print(data_set[ua])
+#     data_set[ua]['spread_5_10'].plot()
+#     data_set[ua]['cumsum_5_10'].plot()
+#     (data_set[ua]['return'].cumsum()/100).plot()
+    index_ret = ua_string+'_ret'
+    data_set[ua][index_ret] = (data_set[ua]['return']/100+1).cumprod()
+    data_set[ua].loc[:,['cumsum_5_10', index_ret]].plot()
+    plt.show()
+    
+    
+    
+    
+    
+    
+    
+    

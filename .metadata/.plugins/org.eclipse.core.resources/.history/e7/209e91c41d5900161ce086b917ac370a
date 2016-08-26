@@ -1,0 +1,55 @@
+# coding=gbk
+
+import pandas as pd
+import pypyodbc
+from datetime import date
+from datetime import timedelta
+
+
+def connect_to_database(driver, ip, port, db_name, user_ID, password):
+    connect_str = ('DRIVER={%s};'
+                     'SERVER=%s,%s;'
+                     'UID=%s;'
+                     'PWD=%s;'
+                     %(driver, ip, port, user_ID, password))
+    #print(connect_str)
+    try:
+        conn = pypyodbc.connect(connect_str)
+        return conn
+    except Exception as e:
+        print(e)
+
+def sql_ret_to_readable(ret, report_type):
+    if report_type == "fund_trans":
+        
+        
+
+if __name__ == "__main__":
+    #result = connect_to_database('SQL Server', '112.74.196.62', '1433', 'jydb_all', 'dpadmin', 'dpadmin')
+    conn = connect_to_database('SQL Server', '112.74.196.62', '1433', 'jydb_all', 'dpadmin', 'dpadmin')
+    
+    portsname = '\'%主动01%\''
+    date_today = date.today()
+    date_today = date_today - timedelta(1)
+    
+    sql_fund_trans = ("select SecurityName, EntrustBS, convert(decimal(18,1), sum(TradeAmount)/10000)"
+                 "as balance from jydb_all.dbo.dpTransDetails a where a.portsname like %s and securitytype = '3' and date = \'%s\'"
+                 "group by SecurityName, EntrustBS" % (portsname, date_today))
+    sql_fund_pos = ("select SecurityName, SecurityID, convert(decimal(18,1),CurrentMarketValue/10000) as '基金市值' "
+                    "from dpPortDetails a where a.portsname like %s and securitytype = '3' and date = \'%s\'" % (portsname, date_today))
+    sql_stock_mkv = ("select convert(decimal(18,1),SUM(a.CurrentMarketValue)/10000) as '股票市值' from dpPortDetails a "
+                     "where a.portsname like %s and securitytype = '0' and date = \'%s\' " % (portsname, date_today))
+    sql_stock_trans = ("select EntrustBS, SUM( TradeAmount) as balance from jydb_all.dbo.dpTransDetails a "
+                       "where a.portsname like %s and securitytype = '0' and date = \'%s\' group by EntrustBS"%(portsname, date_today))
+    
+    result = pd.read_sql(sql_stock_trans, conn)
+    print(result)
+    
+    print(result.to_html())
+    
+    
+    
+    
+    
+    
+    

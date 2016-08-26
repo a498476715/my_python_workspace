@@ -1,0 +1,76 @@
+-- VERSION_4
+-- START DISKCACHE_2
+D:\python\.metadata\.plugins\org.eclipse.core.resources\.projects\study_pandas\com.python.pydev.analysis\v2_indexcache
+dp_reports|1470728123311405000|D:\python\study_pandas\dp_reports.py
+dplib.dp_products|1470665644349158000|D:\python\study_pandas\dplib\dp_products.py
+dplib.lloyd_lib|1470202576433407000|D:\python\study_pandas\dplib\lloyd_lib.py
+test_classes|1470625554394631000|D:\python\study_pandas\test_classes.py
+sw|1471316687529640000|D:\python\study_pandas\sw.py
+test|1470484954436944000|D:\python\study_pandas\test.py
+dp_config|1470662675585354000|D:\python\study_pandas\dp_config.py
+dp_fund_nav|1470712503538350000|D:\python\study_pandas\dp_fund_nav.py
+dplib.windclasses|1470625730042678000|D:\python\study_pandas\dplib\windclasses.py
+for_test|1470375816720853000|D:\python\study_pandas\for_test.py
+dplib.__init__|1470637375555773000|D:\python\study_pandas\dplib\__init__.py
+-- END DISKCACHE
+-- START DICTIONARY
+17
+4=dp_reports
+11=DPFund
+2=test
+8=sw
+9=DPFund.__init__
+17=DPFund.set_estb_date
+15=WindProduct.__init__
+16=DPFund.set_beginning_nav
+13=WindProduct.set_name
+1=dplib.lloyd_lib
+7=dplib.dp_products
+10=DPFund.set_conn
+3=test_classes
+5=dp_config
+6=dplib.windclasses
+12=WindProduct
+14=DPFund.set_name
+-- END DICTIONARY
+-- START TREE 1
+27
+con|4|connect_to_database!10@conn!19@conn!27@conn!35@
+dat|2|date!35@date!19@
+db_|7|db_port!43@db_ip!43@db_name!43@db_driver!43@db_pwd!43@db_types!43@db_usr!43@
+der|1|Derivatives!49@
+dpf|1|DPFund!57@
+fut|1|Future!49@
+gen|1|generate_excel!34@
+get|1|get_his_data!66@
+hea|1|head!35@
+ind|3|Industry!49@Index!49@IndexFuture!49@
+nam|1|name_dict!67@
+pd_|2|pd_data!35@pd_table_list!35@
+por|2|portsname!35@portsname!19@
+pro|3|product_sql_names!43@product_name!35@product_std_names!43@
+res|1|result!19@
+ret|1|ret!27@
+row|1|row!35@
+sec|2|Sector!49@Security!49@
+ser|1|server_name!43@
+sql|10|sql_fund_pos!35@sql_stock_trans!35@sql_stock_mkv!35@sql_fund_trans!19@sql_stock_mkv!19@sql_fund_pos!19@sql_ret_to_readable!34@sql_stock_trans!19@sql_fund_trans!35@sql!35@
+sto|1|Stock!49@
+str|2|string1!27@string2!27@
+sw_|1|sw_sec!67@
+tab|1|table_name!35@
+win|1|WindProduct!49@
+wor|2|workbook!35@worksheet!35@
+wri|1|writer!35@
+-- END TREE
+-- START TREE 2
+8
+__c|2|__conn!9&59@__conn!10&59@
+__i|2|__init__!11&58@__init__!12&50@
+__n|3|__name!13&51@__name!9&59@__name!14&59@
+__w|1|__wind_code!15&51@
+beg|1|beginning_nav!16&59@
+cal|1|cal_nav!11&58@
+get|4|get_yesterday_nav!11&58@get_wind_code!12&50@get_name!12&50@get_YTD!11&58@
+set|7|setup_date!17&59@set_estb_date!11&58@set_beginning_nav!11&58@set_wind_code!12&50@set_name!11&58@set_conn!11&58@set_name!12&50@
+-- END TREE

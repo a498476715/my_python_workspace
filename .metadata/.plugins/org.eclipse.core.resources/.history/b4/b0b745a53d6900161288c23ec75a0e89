@@ -1,0 +1,19 @@
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+
+import pandas as pd
+from pandas import DataFrame
+from pandas import Series
+import pandas.rpy.common as com
+
+import helper
+
+def convert_rdata2csv(src, des):
+    infert = com.load_data(src)
+    type(infert)
+
+def main():
+    convert_rdata2csv('ADailyQuote.rdata', 'test')
+    
+

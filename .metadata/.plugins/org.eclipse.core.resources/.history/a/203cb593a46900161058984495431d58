@@ -1,0 +1,31 @@
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+
+import pandas as pd
+from pandas import DataFrame
+from pandas import Series
+
+import helper
+
+def load_csv_data(filename, columns = None, columns_new = None, index_column = None):
+    '''
+        源文件请使用UTF-8编码
+    columns: 想要读取的columns,不设置会读取全部columns
+    columns_new: 给columns改名
+    '''
+    if columns is not None:
+        data = pd.read_csv(filename, usecols = columns)
+        if columns_new is not None:
+            data.columns = columns_new
+    else:
+        data = pd.read_csv(filename)
+    data = pd.read_csv(filename)
+    return data
+
+def main():
+    data = load_csv_data('../data/PMinQuote.csv', columns=['TDATETIME', 'LASTPX', 'CHGPCTMIN'])
+    
+if __name__ == '__main__':
+    main()
+

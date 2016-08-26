@@ -1,0 +1,11 @@
+de.walware.nico.scope/editor.r/options/assist.circling.ordered_categories.ids\:enabled=r-elements\:true,paths\:true
+de.walware.nico.scope/editor.r/options/assist.default.disabled_categories.ids=
+de.walware.nico.scope/editor.r/options/smartinsert.close_curlybrackets.enabled=true
+de.walware.statet.r.ui.text.r_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+de.walware.statet.r.ui.text.rd_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+eclipse.preferences.version=1
+editor.r/options/assist.circling.ordered_categories.ids\:enabled=r-elements\:true,templates\:true,r-elements.runtime\:true,paths\:true
+editor.r/options/assist.default.disabled_categories.ids=
+editor.r/options/hover.type_settings.ids\:setting=de.walware.statet.r.contentInfoHover.RCombinedHover\:true;,de.walware.statet.r.contentInfoHover.RHelpHover\:true;,de.walware.statet.r.contentInfoHover.RDebugHover\:true;M2
+useAnnotationsPrefPage=true
+useQuickDiffPrefPage=true

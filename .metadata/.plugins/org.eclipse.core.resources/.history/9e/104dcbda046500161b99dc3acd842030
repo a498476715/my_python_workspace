@@ -1,0 +1,123 @@
+# coding=gbk
+
+import pandas as pd
+from pandas import Series
+from pandas import DataFrame
+import matplotlib.pyplot as plt
+import numpy as np
+
+import helper
+import dp_config
+
+index_list = {}
+index_list['hs300'] = '000300.SH'
+index_list['zz500'] = '000905.SH'
+index_list['sz50'] = '000016.SH'
+index_list['cybz'] = '399006.SZ'
+index_list['cybzh'] = '399102.SZ'
+
+data_set = {}
+start_date = '\'20000101\''
+short = True
+
+def get_index_from_db(wind_code, conn):
+    '''
+    希望可以自己设置数据库，设置获取不同数据(用什么价格购买，卖出)
+    '''
+    
+    sql_string = ("select TRADE_DT, S_INFO_WINDCODE, S_DQ_CLOSE, S_DQ_PCTCHANGE " 
+                  "from AINDEXEODPRICES " 
+                  "where S_INFO_WINDCODE = \'%s\' and TRADE_DT > %s"
+                  "order by TRADE_DT" % (wind_code, start_date))
+    data = pd.read_sql(sql_string, conn, index_col='trade_dt', parse_dates=['trade_dt'])
+    data.columns = ['code', 'close', 'return']
+#     data.set_index('trade_dt')
+    return data
+#     print(data)
+
+def strategy_ma(short_term, long_term):
+    '''
+    
+    '''
+    
+    
+def cal_return(short_term, long_term, strategy = 'cross', short = True, short_ua = '000300.SH'):
+     '''
+     只是均线穿越的return，其他并未适配. 做空暂时用标的本身的数据
+     '''
+    #简单cross算法
+     if strategy == 'cross':
+         print()
+
+def cal_signal(data, strategy = 'cross'):
+    '''
+    生成信号列，True为应该多头，False为应该空头.
+    默认的算法为交叉法,data是原data的切片，只是截取需要用来计算的列
+    返回信号列
+    '''
+     
+if __name__ == '__main__':
+    
+    server = '253'
+    db_name = 'wddb'
+    conn = helper.connect_to_database(dp_config.db_driver[server], dp_config.db_ip[server], dp_config.db_port[server],
+                                      'wddb', dp_config.db_usr[server], dp_config.db_pwd[server])
+    
+    # 设置标的物
+    ua_string = index_list['zz500']
+    ua = ua_string
+    
+    data = get_index_from_db(ua_string, conn)
+    
+    ma_days_list = {}
+    
+    name_list = ['ma_5', 'ma_10']
+    value_list = [5, 20]
+    
+    for i in range(len(name_list)):
+        data = helper.ma_simple(data, value_list[i], column_name = name_list[i])
+    
+    
+    data = helper.delete_na(data)
+    
+    data_set[ua] = data
+    
+    #get a slice of data
+    data_fig_ma = data.loc[:,name_list]
+#     data_fig_ma.plot()
+    
+#     data_set[ua]['spread_5_10'] = data_set[ua]['ma_5'] > data_set[ua]['ma_10']
+#     '''
+#     找出所有crossover point
+#     '''
+#     print('##########################################')
+#     print(helper.cross_point(data, 'ma_5', 'ma_10'))
+    '''
+    计算return
+    '''
+    data_set[ua]['spread_5_10'] = data_set[ua]['ma_5'] > data_set[ua]['ma_10']
+    data_set[ua]['spread_5_10'] = data_set[ua]['spread_5_10'].shift(1)
+#     print(data_set[ua]['spread_5_10'])
+    
+    if short:
+        data_set[ua]['ret_5_10'] = (data_set[ua].apply(lambda x: x['return'] if x['spread_5_10'] else -x['return'], axis=1))/100 + 1
+    else:
+        data_set[ua]['ret_5_10'] = (data_set[ua].apply(lambda x: x['return'] if x['spread_5_10'] else 0, axis=1))/100 + 1
+#     data_set[ua]['cumsum_5_10'] = data_set[ua]['ret_5_10'].cumsum()/100
+    data_set[ua]['cumsum_5_10'] = data_set[ua]['ret_5_10'].cumprod()
+    print(data_set[ua])
+#     data_set[ua]['spread_5_10'].plot()
+#     data_set[ua]['cumsum_5_10'].plot()
+#     (data_set[ua]['return'].cumsum()/100).plot()
+    index_ret = ua_string+'_ret'
+    data_set[ua][index_ret] = (data_set[ua]['return']/100+1).cumprod()
+    data_set[ua].loc[:,['cumsum_5_10', index_ret]].plot()
+    plt.show()
+    
+    
+    
+    
+    
+    
+    
+    

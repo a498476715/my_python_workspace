@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;cross_signal/backTesting&apos; to &apos;back_testing.py&apos;" description="Rename resource &apos;backTesting&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="backTesting" name="back_testing.py" stamp="1471397460796" updateReferences="true"/>
+</session>

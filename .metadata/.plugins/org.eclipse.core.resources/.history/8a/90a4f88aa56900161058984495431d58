@@ -1,0 +1,30 @@
+# coding=gbk
+
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+
+import pandas as pd
+from pandas import DataFrame
+from pandas import Series
+
+import helper
+
+def load_csv_data(filename, columns = None, columns_new = None, index_column = None, index_new = None):
+    '''
+    columns: 想要读取的columns,不设置会读取全部columns
+    columns_new: 给columns改名
+    '''
+    data = pd.read_csv(filename, usecols = columns, index_col = index_column)
+    if columns_new is not None:
+        data.columns = columns_new
+    if index_new is not None:
+        data.index.name = index_new
+    return data
+    
+def main():
+    data = load_csv_data('../data/PMinQuote.csv', columns=['TDATETIME', 'LASTPX', 'CHGPCTMIN'], index_new='time', columns_new = ['时间', '最新成交价', '分钟收益%'])
+    print(data.head(n=5))
+if __name__ == '__main__':
+    main()
+

@@ -1,0 +1,12 @@
+MODULES_MANAGER_V2
+dp_config|D:\python\study_pandas\dp_config.py
+dp_fund_nav|D:\python\study_pandas\dp_fund_nav.py
+dp_reports|D:\python\study_pandas\dp_reports.py
+dplib.__init__|D:\python\study_pandas\dplib\__init__.py
+dplib.dp_products|D:\python\study_pandas\dplib\dp_products.py
+dplib.lloyd_lib|D:\python\study_pandas\dplib\lloyd_lib.py
+dplib.windclasses|D:\python\study_pandas\dplib\windclasses.py
+for_test|D:\python\study_pandas\for_test.py
+sw|D:\python\study_pandas\sw.py
+test|D:\python\study_pandas\test.py
+test_classes|D:\python\study_pandas\test_classes.py

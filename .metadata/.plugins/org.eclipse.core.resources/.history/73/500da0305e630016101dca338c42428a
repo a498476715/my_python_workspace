@@ -1,0 +1,28 @@
+# encoding=gbk
+
+import datetime
+import sys
+import pandas as pd
+from pandas import DataFrame as df
+
+# from WindPy import w     
+from WindPy import w
+
+import dplib.lloyd_lib
+import dp_config as cfg
+
+def get_all_windcodes(sec_windcode):
+    
+
+if __name__ == "__main__":
+    w.start(showmenu=False)
+    # 申万一级28个行业代码，名字
+    sw_sec = df(w.wset("SectorConstituent", "date=20160805;sectorId=a39901011g000000").Data[1:3], index=['代码', '板块名称'])
+    sw_sec = sw_sec.T
+    sw_sec.index += 1
+    sw_sec.index.name = '序号'
+#     for key in sw
+    print(sw_sec)
+#     print(w.wset("SectorConstituent","date=20160805;sectorId=a39901011g000000").Data[1])
+    
+    
