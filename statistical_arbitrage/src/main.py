@@ -6,6 +6,7 @@ from datetime import timedelta
 import pandas as pd
 from pandas import DataFrame
 from pandas import Series
+import numpy as np
 
 
 def load_csv_data(filename, columns=None, columns_new=None, index_column=None, index_new=None):
@@ -71,6 +72,34 @@ def delete_na(data):
     return data
 
 
+def high_freq_arbitrage(leg1, leg2, back_time, sig, sig_method, leg1_sig, leg2_sig, up_std, down_std):
+    data = load_two_legs(leg1, leg2)
+    data['sig'] = cal_sig(data[leg1_sig], data[leg2_sig], window=back_time, method=sig_method)
+    data['mean'] = cal_ma(data['sig'], window=back_time)
+    data['sig_sd'] = cal_std(data['sig'], back_time)
+    data['up'] = data['mean'] + up_std * data['sig_sd']
+    data['down'] = data['mean'] - down_std * data['sig_sd']
+    # data['order'] =
+    data = delete_na(data)
+    return data
+
+
+def order_sig(up, down, sig):
+    up_pre = up.shift(1)
+    down_pre = down.shift(1)
+    if up <= sig < up_pre: #long leg1
+        return 1
+    elif mean <= sig < up:
+        return
+
+
+def generate_trans(up, mean, down, sig, vol1, vol2):
+    shift = False
+    transaction_1 = Series(0, index=up.index)
+    pre_sig_1 = sig.shift(1)
+    transaction_1 = np.where()
+
+
 def main():
     # ÅäÖÃÊý¾Ý
     leg1 = 'P'
@@ -86,15 +115,9 @@ def main():
     up_std = 1
     down_std = 1
 
-    data = load_two_legs(leg1, leg2)
-    data['sig'] = cal_sig(data[leg1_sig], data[leg2_sig], window=back_time, method=sig_method)
-    data['mean'] = cal_ma(data['sig'], window=back_time)
-    data['sig_sd'] = cal_std(data['sig'], back_time)
-    data['up'] = data['mean'] + up_std * data['sig_sd']
-    data['down'] = data['mean'] - down_std * data['sig_sd']
+    ret = high_freq_arbitrage(leg1, leg2, back_time, sig, sig_method, leg1_sig, leg2_sig, up_std, down_std)
 
-    data = delete_na(data)
-    print(data.head(n=5))
+    print(ret.head(n=5))
 
 
 if __name__ == '__main__':

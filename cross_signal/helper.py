@@ -77,7 +77,7 @@ def cross_point(data, short_term, long_term):
     previous_short = data[short_term].shift(1)
     previous_long = data[long_term].shift(1)
     crossing = (((data[short_term] <= data[long_term]) & (previous_short >= previous_long))
-            | ((data[short_term] >= data[long_term]) & (previous_short <= previous_long)))
+                | ((data[short_term] >= data[long_term]) & (previous_short <= previous_long)))
     
     crossing_dates = data.loc[crossing]
     return crossing_dates
